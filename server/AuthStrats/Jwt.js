@@ -8,6 +8,8 @@ const opts = {
     secretOrKey : process.env.JWT_SECRET
   }
 
+  // Whenever this strategy is used and a user is validated, it will
+  // add a req.user field which has _id
   passport.use(
       new JwtStrategy(opts, function(jwt_payload, done){
           // If the _id is matched to a user, call the function with the user
