@@ -8,10 +8,12 @@ const passport = require('passport');
 
 // File imports
 const userRoutes = require('./routes/user')
+
 const { startDatabase } = require('./utils.js/database')
-
-
 require("dotenv").config()
+require("./AuthStrats/Jwt")
+require("./AuthStrats/Local")
+require('./authenticate')
 const app = express();
 startDatabase()
 
