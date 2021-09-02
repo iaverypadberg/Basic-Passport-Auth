@@ -12,7 +12,7 @@ const Session = new Schema({
   })
 
 // Limited fields in user to keep it simple for now
-const useSchema = new Schema({
+const userSchema = new Schema({
   firstName: { type: String, required:true },
   refreshToken:[Session]
 })
