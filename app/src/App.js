@@ -2,10 +2,10 @@ import ProtectedRoute from "./ProtectedRoute";
 import Profile from "./pages/Profile";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import Nav from "./nav/Nav"
 import { UserContext } from "./context/UserContext";
 import { BrowserRouter as Router, Link, Switch, Route } from "react-router-dom";
 import { useState, useEffect, useContext, useCallback } from "react";
-
 
 function App() {
   //const [isAuth, setIsAuth] = useState(false);
@@ -39,30 +39,16 @@ function App() {
   }, [verifyUser]);
 
   return (
-      <Router>
-        <Route path="/" exact>
-          {/* <button
-            onClick={() => {
-              setIsAuth(true);
-            }}
-          >
-            Login
-          </button>
-          <button
-            onClick={() => {
-              setIsAuth(false);
-            }}
-          >
-            Logout
-          </button> */}
-          <Link to="/login"> Go to Login</Link>
-          <Link to="/profile">Go to Profile!</Link>
-        </Route>
-
+    <Router>
+      <Nav/>
+      <Route path="/" exact>
+        <Link to="/login"> Go to Login</Link>
+        <Link to="/profile">Go to Profile!</Link>
+      </Route>
         <Route path="/login" component={Login} />
         <Route path="/register" component={Register} />
         <ProtectedRoute path="/profile" component={Profile} />
-      </Router>
+    </Router>
   );
 }
 
