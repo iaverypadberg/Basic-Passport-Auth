@@ -10,7 +10,6 @@ const ProtectedRoute = ({ component: Component, ...rest }) => {
       render={(props) => {
           //If the user is Authenticated load the component which called ProtectedRoute
         if (userContext.isAuthenticated) {
-            console.log("Authenticated")
           return <Component />;
           // Otherwise, redirect to the homepage, and set the from location
         } else {
