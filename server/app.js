@@ -33,7 +33,6 @@ const corsOptions = {
   },
   credentials: true,
   withCredentials:true
-  
 }
 //Allow app to make HTTP requests to express app
 app.use(cors(corsOptions))

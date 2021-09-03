@@ -107,24 +107,26 @@ router.get("/logout", verifyUser, async (req, res, next) => {
 // This route is for renewing the refreshToken.
 // The user must already have a validaRefreshToken stored as a signedCookie in their request
 // They do not need to have a valid JWT token though, as it might have expired
+// Worthy note: For some reason, it complains that payload._id is undefined when destructuring it,
+// even though the value still comes through
 router.post("/refreshToken", async (req, res, next) => {
   const { signedCookies = {} } = req;
   const { refreshToken } = signedCookies;
-  
+
   if (refreshToken) {
     try {
       // Compare the provided token and the secret used to create it
       // If the token is correct, the payload is decoded
-      const payload = jwt.verify(
+      const payload =  jwt.verify(
         refreshToken,
         process.env.REFRESH_TOKEN_SECRET
       );
 
       //The payload will contain the users id, when it was created, and its expiration
-      const { _id } = payload._id;
+      const _id = payload._id;
       console.log("Payload should come next");
       console.log({ _id });
-      const user = await User.findOne(_id);
+      const user = await User.findOne({id:_id});
       const userId = user._id;
 
       if (user) {
