@@ -7,7 +7,7 @@ exports.COOKIE_OPTIONS = {
     secure: !dev,
     signed:true,
     maxAge: eval(60 * 60 * 24 * 3000),
-    sameSite: 'strict',
+    sameSite: 'none',
 }
 
 
@@ -18,7 +18,7 @@ exports.getToken = user => {
 }
 
 exports.getRefreshToken = user =>{
-    console.log({user})
+    // console.log({user})
     const refreshToken = jwt.sign(user,process.env.REFRESH_TOKEN_SECRET,{
         expiresIn: eval(process.env.REFRESH_TOKEN_EXPIRY),
     })
