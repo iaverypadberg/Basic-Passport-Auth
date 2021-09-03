@@ -11,9 +11,19 @@ const Session = new Schema({
     },
   })
 
-// Limited fields in user to keep it simple for now
+// Added More fields
 const userSchema = new Schema({
-  firstName: { type: String,  unique:true },
+  firstName: { type: String,  unique:false },
+  lastName: {type:String, unique:false},
+
+  details:{
+    date: Date,
+    age: Number,
+    profession:[String],
+    description: String,
+    email: String,
+    phone: {type:mongoose.Mixed, unique:true}
+  },
   refreshToken:[Session]
 })
 
