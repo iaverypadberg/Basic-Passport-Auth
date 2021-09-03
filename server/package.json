@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "app": "cd .. && cd app && npm start",
+    "dev": "concurrently --names 'SERVER,APP' -c 'red,green' \"nodemon app.js\" \"npm run app\""
   },
   "keywords": [],
   "author": "",

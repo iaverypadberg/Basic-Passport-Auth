@@ -59,13 +59,14 @@ router.post(
       const token = getToken({ _id: _id });
       const refreshToken = getRefreshToken({ _id: _id });
 
-      const user = await User.findOne(_id);
-      // TODO: Every time login occurs a new refreshToken is added, need to delete the old ones
+      // Find a user and if the exist, invalidate all refreshTokens by clearing the array
+      const user = await User.findOneAndUpdate(_id, {$set:{refreshToken:[]}})
       user.refreshToken.push({ refreshToken });
       user.save();
 
       res.cookie("refreshToken", refreshToken, COOKIE_OPTIONS);
       res.send({ success: true, token });
+
     } catch (err) {
       console.log(err);
       res.send(err);
@@ -79,12 +80,15 @@ router.get("/logout", verifyUser, async (req, res, next) => {
   const { _id } = req.user;
   const { signedCookies = {} } = req;
   const { refreshToken } = signedCookies;
+
   const user = await User.findOne(_id);
 
+  // Get the index of the refresh token which the user provided
   const tokenIndex = await user.refreshToken.findIndex(
     (item) => item.refreshToken === refreshToken
   );
 
+  // Upon logout, remove the invalidate the refreshToken by removing it from the array in the database
   if (tokenIndex !== -1) {
     user.refreshToken.id(user.refreshToken[tokenIndex]._id).remove();
   }
@@ -96,10 +100,16 @@ router.get("/logout", verifyUser, async (req, res, next) => {
 });
 
 //route for getting a refreshToken
-// TODO: Fix bug which always returns Unauthorized
-router.post("/refreshToken", verifyUser, async (req, res, next) => {
+
+// This route is for renewing the refreshToken.
+// The user must already have a validaRefreshToken stored as a signedCookie in their request
+// They do not need to have a valid JWT token though, as it might have expired
+
+// TODO: Fix bug where user can only get one refresh token per login(this will limit session time)
+router.post("/refreshToken", async (req, res, next) => {
   const { signedCookies = {} } = req;
   const { refreshToken } = signedCookies;
+  // console.log({refreshToken})
   if (refreshToken) {
     try {
       // Compare the provided token and the secret used to create it
@@ -108,37 +118,42 @@ router.post("/refreshToken", verifyUser, async (req, res, next) => {
         refreshToken,
         process.env.REFRESH_TOKEN_SECRET
       );
+      // console.log({payload})
       //The payload will contain the users id, when it was created, and its expiration
       const { _id } = payload._id;
       const user = await User.findOne(_id);
 
+      // console.trace({user})
+
       if (user) {
         // Find the refresh token against the user record in database
-        const tokenIndex = user.refreshToken.findIndex(
-          (item) => item.refreshToken === refreshToken
-        );
+        // Look through the refreshToken array, if the item being checkedout equals the refresh token, return the index
+        const tokenIndex = await user.refreshToken.findIndex((item) => item.refreshToken === refreshToken);
         if (tokenIndex === -1) {
           res.statusCode = 401;
-          res.send("Unauthorized");
+          res.send("Token Index is -1");
         } else {
-          const token = getToken(_id);
+
+          // Generate a new new JWT token
+          const token = getToken({_id:_id});
           // If the refresh token exists, then create new one and replace it.
-          const newRefreshToken = getRefreshToken(_id);
+          const newRefreshToken = getRefreshToken({_id:_id});
           user.refreshToken[tokenIndex] = { refreshToken: newRefreshToken };
+          // console.log({user})
           user.save();
 
           res.cookie("refreshToken", newRefreshToken, COOKIE_OPTIONS);
           res.send({ success: true, token });
         }
       }
-      (err) => next(err);
     } catch (err) {
       res.statusCode = 401;
-      res.send("Unauthorized");
+      console.log(err)
+      res.send("Unauthorized 2");
     }
   } else {
     res.statusCode = 401;
-    res.send("Unauthorized");
+    res.send("Unauthorized 3");
   }
 });
 

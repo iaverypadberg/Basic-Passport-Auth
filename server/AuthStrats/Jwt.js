@@ -13,6 +13,7 @@ const opts = {
   passport.use(
       new JwtStrategy(opts, function(jwt_payload, done){
           // If the _id is matched to a user, call the function with the user
+        //   console.trace({jwt_payload})
         User.findOne({_id:jwt_payload._id}, function(err,user){
             if(err){
                 return done(err, false)

@@ -1,32 +1,68 @@
 import ProtectedRoute from "./ProtectedRoute";
-import { BrowserRouter as Router, Link, Switch, Route } from "react-router-dom";
 import Profile from "./pages/Profile";
-import { useState } from "react";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import { UserContext } from "./context/UserContext";
+import { BrowserRouter as Router, Link, Switch, Route } from "react-router-dom";
+import { useState, useEffect, useContext, useCallback } from "react";
+
 
 function App() {
-  const [isAuth, setIsAuth] = useState(false);
-  
+  //const [isAuth, setIsAuth] = useState(false);
+  const [userContext, setUserContext] = useContext(UserContext);
+
+  const verifyUser = useCallback(() => {
+    fetch("http://localhost:8080/user/refreshToken", {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+    }).then(async (response) => {
+      if (response.ok) {
+        const data = await response.json();
+        console.log("User Token Refreshed!");
+        setUserContext((oldValues) => {
+          return { ...oldValues, token: data.token };
+        });
+      } else {
+        setUserContext((oldValues) => {
+          return { ...oldValues, token: null };
+        });
+      }
+
+      // call refreshToken every 5 minutes to renew the authentication token.
+      setTimeout(verifyUser, 5 * 60 * 1000);
+    });
+  }, [setUserContext]);
+
+  useEffect(() => {
+    verifyUser();
+  }, [verifyUser]);
+
   return (
-    <Router>
-      <Route path="/" exact>
-        <button
-          onClick={() => {
-            setIsAuth(true);
-          }}
-        >
-          Login
-        </button>
-        <button
-          onClick={() => {
-            setIsAuth(false);
-          }}
-        >
-          Logout
-        </button>
-        <Link to="/profile">Go to Profile!</Link>
-      </Route>
-      <ProtectedRoute path="/profile" component={Profile} isAuth={isAuth} />
-    </Router>
+      <Router>
+        <Route path="/" exact>
+          {/* <button
+            onClick={() => {
+              setIsAuth(true);
+            }}
+          >
+            Login
+          </button>
+          <button
+            onClick={() => {
+              setIsAuth(false);
+            }}
+          >
+            Logout
+          </button> */}
+          <Link to="/login"> Go to Login</Link>
+          <Link to="/profile">Go to Profile!</Link>
+        </Route>
+
+        <Route path="/login" component={Login} />
+        <Route path="/register" component={Register} />
+        <ProtectedRoute path="/profile" component={Profile} />
+      </Router>
   );
 }
 

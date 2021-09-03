@@ -17,8 +17,26 @@ require('./authenticate')
 const app = express();
 startDatabase()
 
-// Cors, cookie settings, morgan logger, json
-app.use(cors());
+// Add the client URL to the CORS policy
+const whitelist = process.env.WHITELISTED_DOMAINS
+  ? process.env.WHITELISTED_DOMAINS.split(",")
+  : []
+const corsOptions = {
+  
+  origin: function (origin, callback) {
+    if (!origin || whitelist.indexOf(origin) !== -1) {
+      callback(null, true)
+    } else {
+      callback(new Error("Not allowed by CORS"))
+    }
+  },
+  credentials: true,
+  withCredentials:true
+  
+}
+//Allow app to make HTTP requests to express app
+app.use(cors(corsOptions))
+
 app.use(cookieParser(process.env.COOKIE_SECRET))
 app.use(morgan('tiny'))
 app.use(express.json())
