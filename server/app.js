@@ -8,6 +8,7 @@ const passport = require('passport');
 
 // File imports
 const userRoutes = require('./routes/user')
+const detailsRoutes = require('./routes/details')
 
 const { startDatabase } = require('./utils.js/database')
 require("dotenv").config()
@@ -45,7 +46,8 @@ app.use(express.json())
 app.use(passport.initialize())
 
 // Routes
-app.use('/user',userRoutes)
+app.use('/user', userRoutes)
+app.use('/details', detailsRoutes)
 
 // Start server
 app.listen(process.env.PORT,()=>{

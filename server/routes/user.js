@@ -1,28 +1,30 @@
-const express = require("express");
+const express = require('express');
 const User = require("../models/user");
 const router = express.Router();
-const passport = require("passport");
-const jwt = require("jsonwebtoken");
+const passport = require('passport');
+const jwt = require('jsonwebtoken');
 
 const {
   verifyUser,
   getToken,
   getRefreshToken,
   COOKIE_OPTIONS,
-} = require("../authenticate");
+} = require('../authenticate');
 
 // Allows parsing of json
 router.use(express.json());
 
 // Route for adding users to the database without verification
-router.get("/me", verifyUser, async (req, res, next) => {
+router.get('/me', verifyUser, async (req, res, next) => {
   const { firstName } = req.body;
   const user = await User.findOne({ firstName: firstName });
   res.send(`User with first name of ${user.firstName} has been found`);
 });
 
+
+
 // Route for signing a user up
-router.post("/signup", async (req, res, next) => {
+router.post('/signup', async (req, res, next) => {
   try {
     const { username, password, firstName } = req.body;
 
@@ -51,7 +53,7 @@ router.post("/signup", async (req, res, next) => {
 
 //route for login
 router.post(
-  "/login",
+  '/login',
   passport.authenticate("local"),
   async (req, res, next) => {
     try {
@@ -60,13 +62,14 @@ router.post(
       const refreshToken = getRefreshToken({ _id: _id });
 
       // Find a user and if the exist, invalidate all refreshTokens by clearing the array
-      const user = await User.findOneAndUpdate(_id, {$set:{refreshToken:[]}})
+      const user = await User.findOneAndUpdate(_id, {
+        $set: { refreshToken: [] },
+      });
       user.refreshToken.push({ refreshToken });
       user.save();
 
       res.cookie("refreshToken", refreshToken, COOKIE_OPTIONS);
       res.send({ success: true, token });
-
     } catch (err) {
       console.log(err);
       res.send(err);
@@ -75,7 +78,7 @@ router.post(
 );
 
 //route for logout
-router.get("/logout", verifyUser, async (req, res, next) => {
+router.get('/logout', verifyUser, async (req, res, next) => {
   // Delete the JWT token
   const { _id } = req.user;
   const { signedCookies = {} } = req;
@@ -106,7 +109,7 @@ router.get("/logout", verifyUser, async (req, res, next) => {
 // They do not need to have a valid JWT token though, as it might have expired
 
 // TODO: Fix bug where user can only get one refresh token per login(this will limit session time)
-router.post("/refreshToken", async (req, res, next) => {
+router.post('/refreshToken', async (req, res, next) => {
   const { signedCookies = {} } = req;
   const { refreshToken } = signedCookies;
   // console.log({refreshToken})
@@ -128,16 +131,17 @@ router.post("/refreshToken", async (req, res, next) => {
       if (user) {
         // Find the refresh token against the user record in database
         // Look through the refreshToken array, if the item being checkedout equals the refresh token, return the index
-        const tokenIndex = await user.refreshToken.findIndex((item) => item.refreshToken === refreshToken);
+        const tokenIndex = await user.refreshToken.findIndex(
+          (item) => item.refreshToken === refreshToken
+        );
         if (tokenIndex === -1) {
           res.statusCode = 401;
           res.send("Token Index is -1");
         } else {
-
           // Generate a new new JWT token
-          const token = getToken({_id:_id});
+          const token = getToken({ _id: _id });
           // If the refresh token exists, then create new one and replace it.
-          const newRefreshToken = getRefreshToken({_id:_id});
+          const newRefreshToken = getRefreshToken({ _id: _id });
           user.refreshToken[tokenIndex] = { refreshToken: newRefreshToken };
           // console.log({user})
           user.save();
@@ -148,7 +152,7 @@ router.post("/refreshToken", async (req, res, next) => {
       }
     } catch (err) {
       res.statusCode = 401;
-      console.log(err)
+      console.log(err);
       res.send("Unauthorized 2");
     }
   } else {
@@ -158,7 +162,7 @@ router.post("/refreshToken", async (req, res, next) => {
 });
 
 // Logout
-router.get("/logout", verifyUser, (req, res, next) => {
+router.get('/logout', verifyUser, (req, res, next) => {
   const { signedCookies = {} } = req;
   const { refreshToken } = signedCookies;
   User.findById(req.user._id).then(
