@@ -63,14 +63,13 @@ router.post(
       const user = await User.findOneAndUpdate(_id, {
         $set: { refreshToken: [] },
       });
-      // console.log({user})
-      user.refreshToken.push({ refreshToken });
-      // console.log({user})
-      await user.save();
-      // console.log({user})
 
+      user.refreshToken.push({ refreshToken });
+      await user.save();
+      
       res.cookie("refreshToken", refreshToken, COOKIE_OPTIONS);
       res.send({ success: true, token });
+
     } catch (err) {
       console.log(err);
       res.send(err);
@@ -140,7 +139,6 @@ router.post("/refreshToken", async (req, res, next) => {
 
 
         user.save();
-
         res.cookie("refreshToken", newRefreshToken, COOKIE_OPTIONS);
         res.send({ success: true, token });
 
@@ -173,6 +171,8 @@ router.get("/logout", verifyUser, (req, res, next) => {
           res.statusCode = 500;
           res.send(err);
         } else {
+
+          // res.cookie('New', {expires: Date.now()});
           res.clearCookie("refreshToken", COOKIE_OPTIONS);
           res.send({ success: true });
         }
