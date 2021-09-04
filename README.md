@@ -14,7 +14,7 @@
 2. I wrote this code soley for the purpose of learning and becoming better at the MERN stack.
 3. I will explain as much as I can, especially when it comes to the gotchas ;)
 
-## Backhand
+## Back-hand
 Lets start off with express and setting up routes which will work with postman.
 
 Start small. Getting the basics to work is key.
@@ -47,6 +47,7 @@ Boom basic backend dependencies done.
 5. Make a models folder for mongoose models
 6. Add whatever files you
 
+---
 ### Configure mongo databse
 
 
@@ -68,7 +69,7 @@ There are two options here:
     [Data viewer(Robo3T)](https://robomongo.org/)
 
 
-
+---
 ### Mongoose schemas
 
 Creating a schema is a bit like like creating a blueprint for your data. It dictates the structure of data once it is placed in the mongo database. Zooming out a bit, the structure of a mongo database is: A database has collections, collections have documents, and documents are where the data is actually stored. The schema you create will dictate how each new document is structured when it is created. Here are some common patterns used when creating a schema.
@@ -79,6 +80,7 @@ Creating a schema is a bit like like creating a blueprint for your data. It dict
 2. Reference
     - This involves 2 schemas. Two different collections are created, one for each type of schema. A reference field can then be set which will contain the ObjectId of the thing you want to reference. They could both reference each other, or just one of them reference the other. This reference technique can then be taken a step further to include an array of references. This allows one object to point to a bunch of other objects. This might seem like a good idea when initially creating your schemas, but beware, it comes with increased complexity when querying, adding, or deleting from the database. With that said, we are going to use one schema and simply embed data for now.
 
+---
 ### Mongoose queries
 
 Here are some tips I learned for querying embedded data
@@ -86,7 +88,81 @@ Here are some tips I learned for querying embedded data
 1. When updating arrays, do not try to do it in one query.
 
     I recommend querying with the `const user = await findOne(_id)` and then
-    using the `user.friends.push({name:"YAH BOI"})`. Once the friend is pushed onto the array, finish it off with a good ole `user.save()` to add that change to the database.
+    using the `user.friends.push({name:"YAH BOI"})`. Once the friend is pushed onto the array, finish it off with a good ole `user.save()` to 
+    add that change to the database.
 
-For a simple web app like the one im creating here, I am simply goi
-## Front Hand
+2. Updating an array with an array
+
+    Same thing as above, but when you go to update the array use the `$each`
+    `user.details.profession.push({ $each: profession });`
+    > profession is an array of strings here
+
+---
+### .env file
+
+This file great cor constants throughout your application. These can be things such as:
+- Urls
+- JWT secrets
+- Amounts of time
+- And strings that you want to keep around
+
+Word of warning, make sure to include this in your .gitignore file so you dont accidentally upload all your secrets :)
+
+---
+### Authentication with passport
+Oh boy your in for a treat!
+
+> This is only my second time setting up authentication, so it might seem a little thrown together!
+
+#### Install dependencies
+    npm install passport passport-jwt passport-local passport-local-mongoose jsonwebtoken cookie-parser
+
+#### Authetication structure
+
+I will be using a jsonwebtokens(JWT) to verify if a user is who they say they are. More specifically, there will be two JWT's.
+
+- token = A token JWT which is sent directly to the user upon login, has a short validity time(15mins)
+
+- refreshToken =  a basic JWT, which is sent as a SIGNED cookie to the user upon login, has a longer validity time(1 month)
+
+These are the names for these two individual things for the rest of this post.
+
+The difference between these two is very important, as they can seem like the same thing when you're not looking too closely.
+
+#### Quick Rundown on how the JWT's are going to be created.
+
+Each JWT is created with a payload. This payload is baked into the final token, and gets encryted. Upon decryption of the JWT, this payload is
+then revealed. For this application, the payload is going to look like the following: `{_id:usersIdInDatabase}. Because the users id is baked 
+into the JWT upon creation, it is available once decrypted. 
+
+Back to authentication structure.
+
+Once the user logs in with good credentials, they recieve a newly minted token in the response body. Once the token is created, it is valid for 15 minutes. The validity time of this token is purposefully set to be short so that in the event of a hack, the token can only be used for a short window. 
+
+This presents a problem though, because if the user only has a token for 15 minutes, they are going to have to log back in, and get a new token all the time.
+
+Enter refreshToken. Upon login, a refreshToken is also created. This token is then stored in the database as a JWT token. In order to get the token to the user, it is sent as a signed cookie. A signed cookie is signed using a cookie secret(I chose this secret and stored it in the .env file) and can only be decrypted by the owner of the cookie secret. Now any modification of this cookie can be detected. 
+
+> If this cookie is stolen, it can then be used to get a new refreshToken and token
+
+Lucky, by using httpOnly:true in the cookie configuration, this cookie will only every be exposed to the server from which it originated. So if the client side is subject to an XSS attack, this cookie will be protected.
+
+This is not optimal, but it works for a low security application.
+
+Now, with the token expired and the refreshToken waiting in the browser, all it takes is a simple request to a /refreshToken endpoint to get a new token and refreshToken.
+
+The server will recieve the refreshToken, check that it has not been tampered with, then use the decrypted payload from the refreshToken to query the database for a user. If the user exists, create a new token, refreshToken(with the user  id baked into each one) and respond with both.
+
+#### Logout
+
+When a user goes go logout, there are two things to do server side.
+
+1. Invalidate the refreshToken in the users browser
+2. Delete the refreshToken in the database.
+
+Of course, client side you should do some stuff too.
+
+---
+## Front-Hand
+
+[FH/BH](https://www.youtube.com/watch?v=iGAMbNKcN1U)
