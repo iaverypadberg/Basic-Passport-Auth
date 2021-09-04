@@ -21,12 +21,11 @@ const Login = () => {
       const data = {
         username: username,
         password: password,
-        withCredentials: true,
       };
 
       const response = await axios.post(
         "http://localhost:8080/user/login",
-        data
+        data,{withCredentials: true,}
       );
       setIsSubmitting(false);
       if (!response.statusText === "OK") {
@@ -41,16 +40,14 @@ const Login = () => {
       } else {
         setError("GoodLogin");
         console.log("Good Login Info");
+        console.log({response})
         const data = await response.data;
 
         await setUserContext({ token: data.token, isAuthenticated: true });
         setRedirect(true);
 
         console.log(
-          "Logged in User Token: " +
-            userContext.token +
-            "Data Token " +
-            data.token
+          "JWT token: " + data.token
         );
       }
     } catch (err) {

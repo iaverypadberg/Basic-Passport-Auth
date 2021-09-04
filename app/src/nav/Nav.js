@@ -4,7 +4,8 @@ import { Disclosure, Menu, Transition } from "@headlessui/react";
 import { SearchIcon } from "@heroicons/react/solid";
 import { BellIcon, MenuIcon, XIcon } from "@heroicons/react/outline";
 import { UserContext } from "../context/UserContext";
-import {Link,Redirect} from "react-router-dom"
+import { Link, Redirect } from "react-router-dom";
+import axios from "axios";
 
 const Nav = () => {
   const [userContext, setUserContext] = useContext(UserContext);
@@ -12,6 +13,35 @@ const Nav = () => {
   function classNames(...classes) {
     return classes.filter(Boolean).join(" ");
   }
+
+  const logout = async () => {
+    const res = await axios({
+      url: "http://localhost:8080/user/logout",
+      method: "GET",
+      headers: { Authorization: `Bearer ${userContext.token}`},
+      withCredentials: true 
+    });
+
+    return res;
+  };
+
+  // When this function is called, need to invalidate any refresh tokens
+  // And reset the user context so that the JWT token is gone, and isAuthenticated is false
+  const logoutHandler = async () => {
+    try {
+      const { data } = await logout();
+      if (data.success === true) {
+        setUserContext({ token: null, isAuthenticated: false });
+        // Delete the refreshToken cookie
+        console.log("Logged a user out");
+      } else {
+        throw Error;
+      }
+    } catch (err) {
+      console.log("Error logging out");
+    }
+  };
+
   return (
     <Disclosure as="nav" className="bg-gray-800">
       {({ open }) => (
@@ -155,27 +185,30 @@ const Nav = () => {
                           </Menu.Item>
                           <Menu.Item>
                             {({ active }) => (
-                              <a
-                                href="#"
-                                className={classNames(
-                                  active ? "bg-gray-100" : "",
-                                  "block px-4 py-2 text-sm text-gray-700"
-                                )}
-                              >
-                                Sign out
-                              </a>
+                              <Link to="/login">
+                                <a
+                                  onClick={logoutHandler}
+                                  className={classNames(
+                                    active ? "bg-gray-100" : "",
+                                    "block px-4 py-2 text-sm text-gray-700"
+                                  )}
+                                >
+                                  Sign out
+                                </a>
+                              </Link>
                             )}
                           </Menu.Item>
                         </Menu.Items>
                       </Transition>
                     </Menu>
                   ) : (
-                    <Link
-                      classname="bg-gray-900 text-white px-3 py-2 rounded-md text-sm font-medium"
-                      to="/login"
-                    >
-                      Login
-                    </Link>
+                    <div className="ml-4">
+                      <Link to="/login">
+                        <button className="bg-gray-900 text-white px-3 py-2 rounded-md text-sm font-medium">
+                          Login
+                        </button>
+                      </Link>
+                    </div>
                   )}
                 </div>
               </div>

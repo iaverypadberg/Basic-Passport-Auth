@@ -20,17 +20,13 @@ function App() {
       if (response.ok) {
         const data = await response.json();
         console.log("User Token Refreshed!");
-        setUserContext((oldValues) => {
-          return { ...oldValues, token: data.token };
-        });
+        await setUserContext({ token: data.token, isAuthenticated: true });
       } else {
-        setUserContext((oldValues) => {
-          return { ...oldValues, token: null };
-        });
+        setUserContext({ token:null, isAuthenticated:false});
       }
 
       // call refreshToken every 5 minutes to renew the authentication token.
-      setTimeout(verifyUser, 5 * 60 * 1000);
+      setTimeout(verifyUser, 5 * 60 * 100);
     });
   }, [setUserContext]);
 
