@@ -110,7 +110,7 @@ Word of warning, make sure to include this in your .gitignore file so you dont a
 
 ---
 ### Authentication with passport
-Oh boy your in for a treat!
+Oh boy you're in for a treat!
 
 > This is only my second time setting up authentication, so it might seem a little thrown together!
 
