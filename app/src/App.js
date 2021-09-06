@@ -8,7 +8,6 @@ import { BrowserRouter as Router, Link, Switch, Route } from "react-router-dom";
 import { useState, useEffect, useContext, useCallback } from "react";
 
 function App() {
-  //const [isAuth, setIsAuth] = useState(false);
   const [userContext, setUserContext] = useContext(UserContext);
 
   const verifyUser = useCallback(() => {
@@ -25,8 +24,8 @@ function App() {
         setUserContext({ token:null, isAuthenticated:false});
       }
 
-      // call refreshToken every 5 minutes to renew the authentication token.
-      setTimeout(verifyUser, 5 * 60 * 100);
+      // call refreshToken every 15 minutes to renew the authentication token.
+      setTimeout(verifyUser, 15 * 60 * 1000);
     });
   }, [setUserContext]);
 
