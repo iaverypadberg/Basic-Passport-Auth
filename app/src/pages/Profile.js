@@ -32,35 +32,32 @@ const Profile = () => {
         console.log("Could not fetch Profile data");
       },
       onSuccess: (data) => {
-          console.log("Profile data successfully fetched")
+        console.log("Profile data successfully fetched");
       },
     }
   );
 
-//   const setVars  = (data) =>{
-//     const { user } = data;
-//     const { details } = user;
-//     return user, details;
-//   }
- 
+  //   const setVars  = (data) =>{
+  //     const { user } = data;
+  //     const { details } = user;
+  //     return user, details;
+  //   }
 
   return (
-    <>
+    <body className="profile">
       {status === "loading" && <div>Loading Data...</div>}
 
       {status === "error" && <div>Errer Fetching Data</div>}
       {status === "success" && (
         <div>
-          <h1>My Private Profile!</h1>
+          <h1 className="profile">Private profile</h1>
           <div>
             <div>
-              <div>
-                <h1>{`${data.user.ufirstName}`}</h1>
-              </div>
-              <div>
+              <div className="grid">
+                <h1 >{`${data.user.firstName}`}</h1>
                 <h2>{` Username: ${data.user.username}`}</h2>
               </div>
-              <div>
+              <div className="card">
                 <h2>Details</h2>
                 <h3>{` Email : ${data.user.details.email}`}</h3>
                 <h3>{` Phone : ${data.user.details.phone}`}</h3>
@@ -70,12 +67,14 @@ const Profile = () => {
               </div>
             </div>
             <Link to="/">
-              <button>Back to home</button>
+              <button className=" mt-2 px-2 py-1 rounded-md bg-gray-600 hover:bg-gray-400">
+                Back to home
+              </button>
             </Link>
           </div>
         </div>
       )}
-    </>
+    </body>
   );
 };
 

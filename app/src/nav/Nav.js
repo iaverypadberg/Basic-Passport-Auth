@@ -50,44 +50,52 @@ const Nav = () => {
             <div className="relative flex items-center justify-between h-16">
               <div className="flex items-center px-2 lg:px-0">
                 <div className="flex-shrink-0">
-                  <img
+                  {/* <img
                     className="block lg:hidden h-8 w-auto"
                     src="https://tailwindui.com/img/logos/workflow-mark-indigo-500.svg"
-                    alt="Workflow"
-                  />
-                  <img
+                    alt="Welp"
+                  /> */}
+                  <p className= "text-white text-2xl">WELP</p>
+                  {/* <img
                     className="hidden lg:block h-8 w-auto"
                     src="https://tailwindui.com/img/logos/workflow-logo-indigo-500-mark-white-text.svg"
-                    alt="Workflow"
-                  />
+                    alt="Welp"
+                  /> */}
                 </div>
                 <div className="hidden lg:block lg:ml-6">
                   <div className="flex space-x-4">
                     {/* Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" */}
+                    <Link to={'/home'}>
                     <a
-                      href="#"
                       className="bg-gray-900 text-white px-3 py-2 rounded-md text-sm font-medium"
                     >
-                      Dashboard
+                      Home
                     </a>
+                    </Link>
+                    <Link to={'/starwars'}>
                     <a
                       href="#"
                       className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
                     >
-                      Team
+                      Starwars
                     </a>
+                    </Link>
+                    <Link >
                     <a
                       href="#"
                       className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
                     >
-                      Projects
+                      Videos
                     </a>
+                    </Link>
+                    <Link >
                     <a
                       href="#"
                       className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
                     >
-                      Calendar
+                      DadJokes
                     </a>
+                    </Link>
                   </div>
                 </div>
               </div>
@@ -159,8 +167,8 @@ const Nav = () => {
                         <Menu.Items className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
                           <Menu.Item>
                             {({ active }) => (
+                              <Link to="/profile">
                               <a
-                                href="#"
                                 className={classNames(
                                   active ? "bg-gray-100" : "",
                                   "block px-4 py-2 text-sm text-gray-700"
@@ -168,6 +176,7 @@ const Nav = () => {
                               >
                                 Your Profile
                               </a>
+                              </Link>
                             )}
                           </Menu.Item>
                           <Menu.Item>
@@ -185,6 +194,7 @@ const Nav = () => {
                           </Menu.Item>
                           <Menu.Item>
                             {({ active }) => (
+
                               <Link to="/login">
                                 <a
                                   onClick={logoutHandler}

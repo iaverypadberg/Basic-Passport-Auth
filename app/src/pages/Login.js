@@ -92,7 +92,7 @@ const Login = () => {
         </Link>
       </div>
       // Upon successful login, redirect to profile
-      {redirect ? <Redirect to="/profile" /> : ""}
+      {redirect ? <Redirect to="/home" /> : ""}
     </div>
   );
 };

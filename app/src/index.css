@@ -18,3 +18,65 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+body.starwars {
+  margin: 0;
+  font-family: sans-serif;
+  background: #222;
+  color: #ddd;
+  text-align: center;
+}
+.App{
+  width: 960px;
+  margin: 0 auto;
+}
+h1.starwars{
+  color: #ffff57;
+  font-size: 4em;
+  letter-spacing: 2px;
+}
+.starwars{
+  margin: 0 10px;
+  background: black;
+  border: 3px solid #ccc;
+  border-radius: 20px;
+  padding: 10px;
+  color:#ffff57;
+  font-size: 1.2em;
+  cursor: pointer;
+}
+.content{
+  text-align: left;
+}
+
+.card{
+  background-color:rgb(0, 0, 0);
+  padding: 8px 16px;
+  margin: 16px 0;
+  border: 3px solid #ffff57;
+  border-radius: 10px;
+}
+.card h3{
+  margin: 10px 0;
+  color:#ffff57;
+}
+
+h1.profile{
+
+  color: #ffff57;
+  font-size: 4em;
+  letter-spacing: 2px;
+}
+
+body.profile {
+  margin: 0;
+  font-family: sans-serif;
+  background: #222;
+  color: #ddd;
+  text-align: center;
+}
+
+button.profile{
+  background:darkgray;
+  margin:2;
+}
