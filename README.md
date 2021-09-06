@@ -1,4 +1,4 @@
-# A web application which uses MongoDb,Express,React, NodeJs, and the passport package for authentication
+# Web app using MongoDb,Express,React, NodeJs, and the passport package for authentication
 
 ## Application technologies
 
@@ -205,16 +205,62 @@ if the provided username and password combo match a user in the databse, the mat
 
 Otherwise it throws an error and the user is not authenticated.
 
+### **Cookies.**
+
 ### **Protected routes**
 
 Since this application is dependent on a user being logged in to actually use the application, it is important to protect routes so that only logged on users can access them.
 
 Aside from the login/register route, and maybe the front landing page, everything else will be protected.
 
-I am going to implement this protection using the
+I am going to implement this protection using the passport-jwt package.
+
+    exports.verifyUser = passport.authenticate("jwt",{session:false})
+
+The passport-jwt authentication strategy expects a Jwt the token to validate and the secret the token was created with. This validation should be run as middleware every time a use requests access to a protected route.
+
+Alright! That will do it for the backend.
 
 ---
 
 ## ***Front-Hand***
+
+The front end of this application was built with React and tailwindcss.
+
+The thing that gave me the most difficulty on the front end was devising a way to manage the users login state and refect that in the pages they were allowed to view. I also ran into an extremely time consuming axios bug which I will explain in this section.
+
+
+### **State Management**
+
+Being my first month learning React, I was/am unaware of the best practices when it comes to state management. I tried a package called [jotai](https://www.npmjs.com/package/jotai) to manage my state, but never really got it to work the way I wanted it to(If I went back now I could prbably do it just fine). So instead I used UserContext. This enabled me to manage the state of a users authentication in any component I choose, and work pretty seemlesly. Now once the user was authenticated, I had to do something  with that information. This is where I spent most of my time.
+
+### **React-Router**
+
+Early on in my quest to solve the page view problem, I remembered a library a friend had told me about: react-router. I quickly installed it and rushed to implement it. This was a mistake. I had no clue what I was doing and ended up spending so much time debugging code that was never gonna work. It wasnt until I discovered [Pedro Techs Video](https://www.youtube.com/watch?v=qnH5KNtRYEI) on protected routes in react-router that I finally understood what to do.
+
+The solution was to create a protected route component which took in a component. The protected route component then had a route in it which would either load the component if the user was logged in, or redirect them to the login page if they were not.
+
+### **Axios BUG**
+
+This bug took me three days to find. [Here it is](https://stackoverflow.com/questions/68977915/post-request-from-axios-always-returns-unauthorized-despite-having-valid-jwt-set/68988925#68988925):
+
+Axios deletes all headers with this format-
+
+    const fetchProfileDetails = async(config)=>{
+    const res = await axios.POST("http://localhost:8080/users/me", config)
+    }
+
+    const config = {
+        method:"POST",
+        withCredentials: true,
+        headers: {Authorization: `Bearer ${userContext.token}`}
+    }
+
+But does not delete headers in this format-
+
+    const res = await axios({
+    method:'POST',
+    url:"http://localhost:8080/users/test",
+    headers:{'Authorization':`Bearer${token}`}})
 
 [FH/BH](https://www.youtube.com/watch?v=iGAMbNKcN1U)
